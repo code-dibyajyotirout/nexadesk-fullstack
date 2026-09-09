@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nexadesk-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000/ws/replay
+      - DATABASE_URL=postgresql://nexadesk:nexadesk_secret@postgres:5432/nexadesk_db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - backend
+      - redis
+      - postgres
+    networks:
+      - nexadesk-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nexadesk-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - HOST=0.0.0.0
+      - PORT=8000
+      - CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      - DATABASE_URL=postgresql+asyncpg://nexadesk:nexadesk_secret@postgres:5432/nexadesk_db
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=nexadesk_production_distributed_secret_key_32bytes
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nexadesk-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: nexadesk-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --save "" --appendonly no
+    volumes:
+      - redis-data:/data
+    networks:
+      - nexadesk-net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: nexadesk-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=nexadesk
+      - POSTGRES_PASSWORD=nexadesk_secret
+      - POSTGRES_DB=nexadesk_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - nexadesk-net
+
+networks:
+  nexadesk-net:
+    driver: bridge
+
+volumes:
+  redis-data:
+  postgres-data:

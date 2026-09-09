@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+.pnpm-store
+.yarn/*
+!*.yarn/patches
+!*.yarn/plugins
+
+# Python Virtual Environments and Caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Next.js and Web Build Outputs
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment Variables & Secrets
+.env
+.env*
+*.env
+!.env.example
+.npmrc
+
+# Database & Cache Data
+*.sqlite
+*.db
+data/
+dump.rdb
+
+# Testing & Coverage
+coverage/
+*.lcov
+.nyc_output
+
+# IDEs & OS Metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
